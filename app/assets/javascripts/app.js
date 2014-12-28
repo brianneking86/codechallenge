@@ -1,27 +1,35 @@
+AWS.config.update({
+    accessKeyId:     'AKIAIORSY2OG7W3FHNHQ', 
+    secretAccessKey: 'ObXBtFwAiaGwB210evsH5KEyi/OHYsCMeR71TwJ2', // replace these credentials with the keys provided to you
+    region: 'us-west-2'
+  });
+
 angular.module('codechallenge', []).controller('MainCtrl', ['$scope', function($scope){
     $scope.greeting = "Hi, add and view your files here";
-    var bucket = new AWS.S3({params: {Bucket: 'yh.interview'}});
     $scope.addFile = function(bucket){
-      debugger;
-
-      // bucket.putObject({
-      //   Key: "brianneking/trialfile.txt", // this is basically the filename -- replace YOURNAME with your first and last name, lowercase, no spaces
-      //   ACL: "public-read", // must include this exactly as is, this is what allows you to get the uploaded file from your browser
-      //   Body: "trial file" // this is the content of the file
-      //   }, function(err, data) { // optional -- this is the callback that is executed when the operation is complete; 
-      //                            // highly recommended -- it will be nice to know when it has worked and when it has failed;
-      //                            // the user will probably want to know, too 
-      //     if (err) {
-      //       console.log(err);
-      //     }
-      //     if (data) {
-      //       console.log(data);
-      //     }
-      //   }
-      // )
+      var bucket = new AWS.S3({params: {Bucket: 'codechallengetrial'}});
+      var fileChooser = document.getElementById('file-chooser');
+      var file = fileChooser.files[0];
+      
+      bucket.putObject({
+        Key: "brianneking86/trialfile.txt", // this is basically the filename -- replace YOURNAME with your first and last name, lowercase, no spaces
+        ACL: "public-read", // must include this exactly as is, this is what allows you to get the uploaded file from your browser
+        Body: file // this is the content of the file
+        }, 
+        function(err, data) { // optional -- this is the callback that is executed when the operation is complete; 
+                                 // highly recommended -- it will be nice to know when it has worked and when it has failed;
+                                 // the user will probably want to know, too 
+          if (err) {
+            console.log(err);
+          }
+          if (data) {
+            console.log(data);
+          }
+        }
+      )
     };
     
-  //   $scope.listFile = function(){
+  //   $scope.listFiles = function(){
   //     bucket.listObjects({
   //       Prefix: "brianneking" // again replace with your first and last name, lower case, no spaces; must include this key
   //     }, function(err, data) {

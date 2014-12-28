@@ -1,9 +1,3 @@
-AWS.config.update({
-    accessKeyId:     'AKIAIORSY2OG7W3FHNHQ', 
-    secretAccessKey: 'ObXBtFwAiaGwB210evsH5KEyi/OHYsCMeR71TwJ2', // replace these credentials with the keys provided to you
-    region: 'us-west-2'
-  });
-
 angular.module('codechallenge', []).controller('MainCtrl', ['$scope', function($scope){
     $scope.greeting = "Hi, add and view your files here";
     $scope.addFile = function(bucket){

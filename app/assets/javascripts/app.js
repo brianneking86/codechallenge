@@ -1,7 +1,7 @@
 angular.module('codechallenge', []).controller('MainCtrl', ['$scope', function($scope){
     $scope.greeting = "Hi, add and view your files here";
-    // var bucket = new AWS.S3({params: {Bucket: 'yh.interview'}});
-    $scope.addFile = function(){
+    var bucket = new AWS.S3({params: {Bucket: 'yh.interview'}});
+    $scope.addFile = function(bucket){
       debugger;
 
       // bucket.putObject({

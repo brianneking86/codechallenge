@@ -13,4 +13,5 @@
 //= require jquery
 //= require jquery_ujs
 //= require angular/angular
+//= require aws-sdk-js
 //= require_tree .

@@ -51,6 +51,8 @@ body{
 .rename-file{
   display:inline;
   float: left;
+  cursor: pointer;
+  text-decoration: underline;
 }
 .cancel{
   display:inline;

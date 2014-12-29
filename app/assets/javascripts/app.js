@@ -13,7 +13,7 @@ $(document).ready(function(){
 });
 
 AWS.config.update({
-    accessKeyId:     '<insert key id here>', 
+    accessKeyId:     '<insert key here>', 
     secretAccessKey: '<insert secret here>'
   });
 
@@ -113,8 +113,8 @@ angular.module('codechallengeControllers', []).controller('MainCtrl', ['$scope',
         $awsService.addFile(file, function() {
           $awsService.listFiles(updateFiles);
         });
-        document.getElementById('file-chooser') = "";
       }
+      document.getElementById('file-chooser').value = "";
     }
 
     $scope.deleteFile = function(file){

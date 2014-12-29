@@ -1,0 +1,71 @@
+body{
+  background-image: url("download.jpeg");
+}
+.wrapper {
+  font-family: 'Roboto Condensed', sans-serif;
+  width: 80%;
+  height: 800px;
+  padding: 20px;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  text-align: center;
+  overflow: scroll;
+}
+
+.upload{
+  width: 250px;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+#file-chooser{
+  border: 4px;
+  border-style: ridge;
+  border-color: rgb(192,192,192);
+  padding: 1px;
+}
+.table{
+  border: 4px;
+  border-style: ridge;
+  border-color: rgb(192,192,192);
+}
+.file-names{
+  width: 720px;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  text-align: center;
+}
+.update-file{
+  display:inline;
+  float: left;
+}
+.rename-file{
+  display:inline;
+  float: left;
+}
+.cancel{
+  display:inline;
+  float: right;
+  font-size: 20px;
+}
+.left{
+  width: 320px;
+  text-align: left;
+}
+.middle{
+  width: 30px;
+  text-align: left;
+}
+.right{
+  width: 360px;
+  text-align: center;
+}

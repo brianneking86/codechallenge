@@ -1,24 +1,38 @@
+$(document).ready(function(){
+  $('.update-file').hide();
+  $('.cancel').hide();
+  $('.wrapper').on('click', '.rename-file', function(){
+    $(this).hide();
+    $(this).siblings().show();
+  });
+  $('.wrapper').on('click', '.cancel', function(){
+    $(this).hide();
+    $(this).siblings('div').hide();
+    $(this).siblings('span').show();
+  });
+});
 
+AWS.config.update({
+    accessKeyId:     '<insert key id here>', 
+    secretAccessKey: '<insert secret here>'
+  });
 
 angular.module('codechallengeServices', []).factory('awsService', ['$window','$rootScope', function($window, $scope) {
-  $scope.bucket = new AWS.S3({params: {Bucket: 'codechallengetrial'}});
+  $scope.bucket = new AWS.S3({params: {Bucket: 'yh.interview'}});
 
   return {
     listFiles: function(successCallback) {
-        $scope.bucket.listObjects({Prefix: "brianneking86"}, function(err, data) {
-        
-        
+      $scope.bucket.listObjects({Prefix: "brianneking"}, function(err, data) {
         if (err) {
           console.log(err)
         }
-
         if (data) {
           successCallback(data);
         }
-    });
+      });
     },
    downloadFile: function(awsObject) {
-      var params = {Bucket: 'codechallengetrial', Key: awsObject.Key};
+      var params = {Bucket: 'yh.interview', Key: awsObject.Key};
 
       $scope.bucket.getSignedUrl('getObject', params, function (err, url) {
           $window.location = url;
@@ -26,13 +40,11 @@ angular.module('codechallengeServices', []).factory('awsService', ['$window','$r
     },
     addFile: function(file, successCallback){
       $scope.bucket.putObject({
-        Key: "brianneking86/" + file.name, // this is basically the filename -- replace YOURNAME with your first and last name, lowercase, no spaces
-        ACL: "public-read", // must include this exactly as is, this is what allows you to get the uploaded file from your browser
-        Body: file // this is the content of the file
+        Key: "brianneking/" + file.name,
+        ACL: "public-read",
+        Body: file
         }, 
-        function(err, data) { // optional -- this is the callback that is executed when the operation is complete; 
-                                 // highly recommended -- it will be nice to know when it has worked and when it has failed;
-                                 // the user will probably want to know, too 
+        function(err, data) { 
           if (err) {
             console.log(err);
           }
@@ -43,23 +55,48 @@ angular.module('codechallengeServices', []).factory('awsService', ['$window','$r
         }
       )
     },
-    deleteFile: function(file) {
-
+    deleteFile: function(file, successCallback) {
+      $scope.bucket.deleteObject({
+        Key: file.Key
+      },
+      function(err, data) { 
+          if (err) {
+            console.log(err, err.stack);
+          }
+          if (data) {
+            successCallback();            
+            console.log(data);
+          }
+        }
+      )
     },
-    renameFile: function(file, newFile) {
-      // $scope.bucket.copyObject
-
+    renameFile: function(file, newFile, successCallback) {
+      var params = {
+        CopySource: 'https://s3.amazonaws.com/yh.interview/' + file.Key,
+        Key: 'brianneking/' + newFile
+      }
+      $scope.bucket.copyObject(params,
+        function(err, data) { 
+          if (err) {
+            console.log(err, err.stack);
+          }
+          if (data) {
+            successCallback();            
+            console.log(data);
+          }
+        }
+      );
     }
   }
 }]);
 
 angular.module('codechallengeControllers', []).controller('MainCtrl', ['$scope', '$window', 'awsService', function($scope, $window, $awsService){
-  $scope.greeting = "Add and view your files here";
-  $scope.files = Array();
+  $scope.greeting = "Manage your files here";
 
    var updateFiles = function(data) {
+    $scope.files = Array();
           angular.forEach(data.Contents, function(awsObject) {
-            if(awsObject.Key != "brianneking86/"){
+            if(awsObject.Key != "brianneking/"){
               $scope.files.push(awsObject);
             }
           });
@@ -76,17 +113,28 @@ angular.module('codechallengeControllers', []).controller('MainCtrl', ['$scope',
         $awsService.addFile(file, function() {
           $awsService.listFiles(updateFiles);
         });
+        document.getElementById('file-chooser') = "";
       }
     }
 
-    $scope.deleteFile = function(){
-      var fileName = document.getElementById('file-name').name;
-      if(fileName) {
-        $awsService.deleteFile(fileName);
+    $scope.deleteFile = function(file){
+      if(file) {
+        $awsService.deleteFile(file, function() {
+          $awsService.listFiles(updateFiles);
+        });
       }
     };
     $scope.download = function(file) {
       $awsService.downloadFile(file);
+    }
+    $scope.renameFile = function(file) {
+      var newName = document.getElementById('newFile').value;
+      if (newName){
+        $awsService.renameFile(file, newName, function() {
+            $scope.deleteFile(file);
+            $awsService.listFiles(updateFiles);
+          });
+      }
     }
   }
 ]);

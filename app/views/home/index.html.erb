@@ -2,14 +2,39 @@
   <head>
     <title>My Angular App!</title>
   </head>
-  <body ng-app="codechallenge" ng-controller="MainCtrl">
+  <body ng-app="codechallengeApp" ng-controller="MainCtrl">
     <div>
-      {{greeting}}
+      <h1>{{greeting}}</h1>
     </div>
+    <br>
+    <h3>Upload a file here</h3>
     <form ng-submit="addFile()">
       <input type="file" placeholder="Add File" ng-model="file" id="file-chooser"></input>
       <br>
       <button type="submit">Post</button>
     </form>
+    <br>
+    <h3> Your files </h3>
+    <div class="file-names">
+      <table class='table'>
+      <thead>
+        <th>File</th>
+        <th></th>
+      </thead>
+      <tbody>
+      <tr ng-repeat="file in files">
+        <td>
+        <a ng-click="download(file)">{{file.Key}}</a>
+        </td>
+        <td>
+        <form ng-submit="deleteFile()">
+          <input type="hidden" id="file-name" name={{file.Key}}>
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+      </tr>
+    </tbody>
+  </table>
+    </div>
   </body>
 </html>

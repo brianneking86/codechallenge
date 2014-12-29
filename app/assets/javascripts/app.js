@@ -1,12 +1,32 @@
-angular.module('codechallenge', []).controller('MainCtrl', ['$scope', function($scope){
-    $scope.greeting = "Hi, add and view your files here";
-    $scope.addFile = function(bucket){
-      var bucket = new AWS.S3({params: {Bucket: 'codechallengetrial'}});
-      var fileChooser = document.getElementById('file-chooser');
-      var file = fileChooser.files[0];
-      
-      bucket.putObject({
-        Key: "brianneking86/trialfile.txt", // this is basically the filename -- replace YOURNAME with your first and last name, lowercase, no spaces
+
+
+angular.module('codechallengeServices', []).factory('awsService', ['$window','$rootScope', function($window, $scope) {
+  $scope.bucket = new AWS.S3({params: {Bucket: 'codechallengetrial'}});
+
+  return {
+    listFiles: function(successCallback) {
+        $scope.bucket.listObjects({Prefix: "brianneking86"}, function(err, data) {
+        
+        
+        if (err) {
+          console.log(err)
+        }
+
+        if (data) {
+          successCallback(data);
+        }
+    });
+    },
+   downloadFile: function(awsObject) {
+      var params = {Bucket: 'codechallengetrial', Key: awsObject.Key};
+
+      $scope.bucket.getSignedUrl('getObject', params, function (err, url) {
+          $window.location = url;
+      });
+    },
+    addFile: function(file, successCallback){
+      $scope.bucket.putObject({
+        Key: "brianneking86/" + file.name, // this is basically the filename -- replace YOURNAME with your first and last name, lowercase, no spaces
         ACL: "public-read", // must include this exactly as is, this is what allows you to get the uploaded file from your browser
         Body: file // this is the content of the file
         }, 
@@ -17,38 +37,58 @@ angular.module('codechallenge', []).controller('MainCtrl', ['$scope', function($
             console.log(err);
           }
           if (data) {
+            successCallback();            
             console.log(data);
           }
         }
       )
+    },
+    deleteFile: function(file) {
+
+    },
+    renameFile: function(file, newFile) {
+      // $scope.bucket.copyObject
+
+    }
+  }
+}]);
+
+angular.module('codechallengeControllers', []).controller('MainCtrl', ['$scope', '$window', 'awsService', function($scope, $window, $awsService){
+  $scope.greeting = "Add and view your files here";
+  $scope.files = Array();
+
+   var updateFiles = function(data) {
+          angular.forEach(data.Contents, function(awsObject) {
+            if(awsObject.Key != "brianneking86/"){
+              $scope.files.push(awsObject);
+            }
+          });
+          $scope.$apply();
+        };
+   
+
+   $awsService.listFiles(updateFiles);
+    //method for adding a file to the bucket
+    $scope.addFile = function() {
+      var fileChooser = document.getElementById('file-chooser');
+      var file = fileChooser.files[0];
+      if(file) {
+        $awsService.addFile(file, function() {
+          $awsService.listFiles(updateFiles);
+        });
+      }
+    }
+
+    $scope.deleteFile = function(){
+      var fileName = document.getElementById('file-name').name;
+      if(fileName) {
+        $awsService.deleteFile(fileName);
+      }
     };
-    
-  //   $scope.listFiles = function(){
-  //     bucket.listObjects({
-  //       Prefix: "brianneking" // again replace with your first and last name, lower case, no spaces; must include this key
-  //     }, function(err, data) {
-  //       if (err) {
-  //         console.log(err)
-  //       }
-  //       if (data) {
-  //         console.log(data) // you'll want to do something more interesting than console.log with the data
-  //                           // data will be a javascript object that looks something like this:
-  //                           // {
-  //                           //   CommonPrefixes: [],
-  //                           //   Contents: [
-  //                           //    {ETag: "number", Key: "first_filename", LastModified: aDate, Size: 200, StorageClass: "STANDARD"},
-  //                           //    {ETag: "anotherNumber", Key: "second_filename", LastModified: anotherDate, Size: 500, StorageClass: "STANDARD"},
-  //                           //   ],
-  //                           //   IsTruncated: false,
-  //                           //   Marker: "",
-  //                           //   MaxKeys: 1000, 
-  //                           //   Name: "yh.interview",
-  //                           //   Prefix: "YOURNAME"
-  //                           // }
-  //                           // you're probably only going to be interested in Contents, and then the Key attribute from the objects in that array
-  //                           // data.Contents[0].Key will get you "first_filename", the name of the first file in your bucket
-  //       }
-  //   });
-  // };
+    $scope.download = function(file) {
+      $awsService.downloadFile(file);
+    }
   }
 ]);
+
+angular.module('codechallengeApp', ['codechallengeControllers','codechallengeServices']);

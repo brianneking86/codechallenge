@@ -105,7 +105,7 @@ angular.module('codechallengeControllers', []).controller('MainCtrl', ['$scope',
    
 
    $awsService.listFiles(updateFiles);
-    //method for adding a file to the bucket
+    
     $scope.addFile = function() {
       var fileChooser = document.getElementById('file-chooser');
       var file = fileChooser.files[0];
